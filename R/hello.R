@@ -17,7 +17,7 @@
 library(librarian)
 shelf(xml2, GEOquery, limma, dplyr)
 
-options(stringsAsFactors = F)
+options(stringsAsFactors = FALSE)
 # proxy----
 proxy <- function(ip = "") { # ip <- ""
   if ("" %in% ip) {
@@ -39,21 +39,27 @@ proxy <- function(ip = "") { # ip <- ""
 }
 # environment_check----
 ## Can create mutiple folder
+# shelfEnvironment函数定义，参数为file_dir_list和path
 shelfEnvironment <- function(file_dir_list = file_dir_list, path = ".") {
+  # 对于file_dir_list中的每个元素
   for (i in seq_along(file_dir_list)) { # i <- 1
+    # 取出file_dir_list[i]的值，作为文件夹名字
     file_dir <- file_dir_list[i]
+    # 试图将工作路径设置为指定的路径
     environment_check <- try(setwd(paste(path, file_dir, sep = "/")),
       silent = TRUE
     )
+    # 如果出现错误，即路径不存在，则创建路径
     if ("try-error" %in% class(environment_check)) {
       dir.create(paste(path, file_dir, sep = "/"), recursive = TRUE)
-      print("Environment fix successfully!")
-      setwd(paste(path, file_dir, sep = "/"))
+      print("Environment fix successfully!") # 输出创建路径的信息
+      setwd(paste(path, file_dir, sep = "/")) # 设置工作路径为创建的路径
     } else {
-      print("Environment check successfully!")
+      print("Environment check successfully!") # 输出路径存在的信息
     }
   }
 }
+
 
 # get GEOfile's downloading url----
 # get file's downloading url
