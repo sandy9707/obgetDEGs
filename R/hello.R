@@ -288,3 +288,16 @@ Intersects <- function(...) {
 getGSEExprSet <- function(gseacc) {
   load(paste(rootDir, gseacc, paste(gseacc, "-output.Rdata", sep = ""), sep = "/"))
 }
+#
+sort_chr <- function(x) {
+  x <- as.character(x)
+  dat_x <- data.frame(
+    x = x, x0 = x
+  )
+  dat_x$x0 <- str_extract(x, "[0-9]+") %>% as.numeric()
+  dat_x <- dat_x[order(dat_x$x0, method = c("auto")), ]
+  x1 <- factor(x, levels = dat_x$x) # levels定死了
+  x1 <- sort(x1)
+  x1 <- as.character(x1)
+  return(x1)
+}
