@@ -19,22 +19,17 @@ shelf(xml2, GEOquery, limma, dplyr)
 
 options(stringsAsFactors = FALSE)
 # proxy----
-proxy <- function(ip = "") { # ip <- ""
+proxy <- function(ip = "", port = "7890") { # ip <- ""
   if ("" %in% ip) {
     Sys.setenv(http_proxy = "")
     Sys.setenv(https_proxy = "")
     Sys.setenv(all_proxy = "")
     print("Don't use proxy! ")
-  } else if ("default" %in% ip) {
-    Sys.setenv(http_proxy = "http://10.147.18.196:7890")
-    Sys.setenv(https_proxy = "http://10.147.18.196:7890")
-    Sys.setenv(all_proxy = "socks5://10.147.18.196:7890")
-    print("Use macmini.yeyezi.zerotier's proxy successful! ")
-  } else if ("default" %in% ip) {
-    Sys.setenv(http_proxy = paste0("http://", ip, ":7890"))
-    Sys.setenv(https_proxy = paste0("http://", ip, ":7890"))
-    Sys.setenv(all_proxy = paste0("socks5://", ip, ":7890"))
-    print("Use ip's proxy successful! ")
+  } else {
+    Sys.setenv(http_proxy = paste0("http://", ip, port))
+    Sys.setenv(https_proxy = paste0("http://", ip, port))
+    Sys.setenv(all_proxy = paste0("socks5://", ip, port))
+    print(paste("Use proxy ", ip, ":", port, " successful! ", sep = ""))
   }
 }
 # environment_check----
@@ -59,7 +54,6 @@ shelfEnvironment <- function(file_dir_list = file_dir_list, path = ".") {
     }
   }
 }
-
 
 # get GEOfile's downloading url----
 # get file's downloading url
@@ -97,7 +91,7 @@ getFileList <- function(gseAcc, typeDown = "matrix") { # gseAcc <- "GSE166424"
   return(merge)
 }
 # download form file list and unzip
-getFile <- function(FileList, unzip = F, readin = F) {
+getFile <- function(FileList, unzip = FALSE, readin = F) {
   print(FileList)
   # select the number of list
   if (1 %in% length(FileList)) { # FileList <- supplUrlList[1]
@@ -151,9 +145,14 @@ getFile <- function(FileList, unzip = F, readin = F) {
   if (readin == T) {
     SuffixRead <- str_remove_all(string = fileNameRead, pattern = ".*\\.")
     if ("csv" %in% SuffixRead) {
-      tem <- read.table(fileNameRead, sep = ",", quote = "", fill = T, header = T, check.names = F)
+      tem <- read.table(fileNameRead,
+        sep = ",", quote = "",
+        fill = TRUE, header = TRUE, check.names = F
+      )
     } else if ("txt" %in% SuffixRead) {
-      tem <- read.table(fileNameRead, sep = "\t", quote = "", fill = T, header = T, check.names = F)
+      tem <- read.table(fileNameRead,
+        sep = "\t", quote = "", fill = TRUE, header = TRUE, check.names = F
+      )
     } else if ("annot" %in% SuffixRead) {
       tem <- read.delim(paste0(gplAcc, ".annot"), stringsAsFactors = FALSE, skip = 27)
     } else {
@@ -210,7 +209,7 @@ degWork <- function(dat = dat, degWorkWay = "limma") {
     # boxplot(dat,outline=FALSE, notch=T,col=group_list,las=2)
     library(limma)
     dat <- normalizeBetweenArrays(dat)
-    boxplot(dat, outline = FALSE, notch = T, col = group_list, las = 2)
+    boxplot(dat, outline = FALSE, notch = TRUE, col = group_list, las = 2)
 
     # deg
     dat[1:4, 1:4]
@@ -244,7 +243,7 @@ degWork <- function(dat = dat, degWorkWay = "limma") {
   return(deg)
 }
 # function----
-getDEGsList <- function(gseacc_list, logFC = 1, p = "a", is.matrix = F, select = c("UP", "DOWN")) {
+getDEGsList <- function(gseacc_list, logFC = 1, p = "a", is.matrix = FALSE, select = c("UP", "DOWN")) {
   DEGsList <- list()
   fileNameList <- c(paste(gseacc_list, 1, sep = "_"))
   DEGsList <- list()
@@ -286,7 +285,10 @@ Intersects <- function(...) {
 }
 # getDEGs
 getGSEExprSet <- function(gseacc) {
-  load(paste(rootDir, gseacc, paste(gseacc, "-output.Rdata", sep = ""), sep = "/"))
+  load(paste(rootDir, gseacc,
+    paste(gseacc, "-output.Rdata", sep = ""),
+    sep = "/"
+  ))
 }
 #
 sort_chr <- function(x) {
