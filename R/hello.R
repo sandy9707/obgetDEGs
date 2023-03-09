@@ -26,9 +26,9 @@ proxy <- function(ip = "", port = "7890") { # ip <- ""
     Sys.setenv(all_proxy = "")
     print("Don't use proxy! ")
   } else {
-    Sys.setenv(http_proxy = paste0("http://", ip, port))
-    Sys.setenv(https_proxy = paste0("http://", ip, port))
-    Sys.setenv(all_proxy = paste0("socks5://", ip, port))
+    Sys.setenv(http_proxy = paste0("http://", ip, ":", port))
+    Sys.setenv(https_proxy = paste0("http://", ip, ":", port))
+    Sys.setenv(all_proxy = paste0("socks5://", ip, ":", port))
     print(paste("Use proxy ", ip, ":", port, " successful! ", sep = ""))
   }
 }
