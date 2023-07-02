@@ -303,3 +303,35 @@ sort_chr <- function(x) {
   x1 <- as.character(x1)
   return(x1)
 }
+get_all_choice_matrix <- function(gset, sam_data_matrix) {
+  library(dplyr)
+  library(stringr)
+  library(purrr)
+  # 获取所有选项
+  source_name <- grep(
+    x = names(sam_data_matrix),
+    pattern = "source_name", fixed = T, value = T
+  )
+  title_name <- grep(names(sam_data_matrix),
+    pattern = "title", value = T, fixed = T
+  )
+  sam_char <- grep(names(gset[[1]]@phenoData@data),
+    pattern = ":", value = T, fixed = T
+  )
+  all_choice <- c(source_name, title_name, sam_char)
+  # 获取所有选项数据
+  all_choice_matrix_data <- map(
+    all_choice, ~ {
+      unique(sam_data_matrix[, .x])
+    }
+  ) %>%
+    setNames(all_choice) %>%
+    .[which(lengths(.) > 1)]
+  all_choice <- names(all_choice_matrix_data)
+  # 获取选项数据框
+  all_choice_matrix <- do.call(cbind, lapply(
+    lapply(all_choice_matrix_data, unlist),
+    `length<-`, max(lengths(all_choice_matrix_data))
+  )) %>% as.data.frame()
+  return(all_choice_matrix)
+}
